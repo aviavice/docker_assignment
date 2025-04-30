@@ -2,7 +2,7 @@
 
 This repository implements a simple AIS (Automatic Identification System) data pipeline, packaged into a Docker container. The project performs the following steps:
 
-1. `download.py`: downloads a ZIP of AIS data CSV
+1. `download.py`: downloads a ZIP of AIS data CSV of the date 2024-05-11
 2. `unzipper.py`: unzips the file into CSV file.
 3. `sorter.py`: sorts the extracted file by vessel MMSI and timestamp.
 4. `analysis.py`: analyzes statistics (total records, unique vessels, speed distributions, navigational status counts) and outputs a JSON summary.
@@ -35,16 +35,24 @@ pip install -r requirements.txt
 
 ```bash
 # 1) Download
-python -m src.download --url <ZIP_URL> --out data/downloads
+python -m src.download
+  --url https://web.ais.dk/aisdata/aisdk-2024-05-11.zip
+  --out data/downloads
 
 # 2) Unzip
-python -m src.unzipper --zip data/downloads/<FILE>.zip --out data/extracted_files
+python -m src.unzipper
+  --zip data/downloads/aisdk-2024-05-11.zip
+  --out data/extracted_files
 
 # 3) Sort
-python -m src.sorter --in data/extracted_files/raw.csv --out data/extracted_files/sorted.csv
+python -m src.sorter
+  --in data/extracted_files/aisdk-2024-05-11.csv
+  --out data/extracted_files/sorted.csv
 
 # 4) Analyze
-python -m src.analysis --csv data/extracted_files/sorted.csv --out output/summary.json
+python -m src.analysis 
+  --csv data/extracted_files/sorted.csv 
+  --out output/summary.json
 ```
 
 ### To build the Docker image
@@ -59,29 +67,37 @@ docker build -t ais_summary:latest .
 
 ```bash
 # 1) Download
-docker run --rm \
-  -v $(pwd)/data:/app/data" \
-  ais_summary:latest \
-  -m src.download --url https://…/ais.zip --out /app/data/downloads
+docker run --rm
+  -v "$(pwd)/data:/app/data"
+  ais_summary:latest
+  -m src.download
+  --url https://web.ais.dk/aisdata/aisdk-2024-05-11.zip
+  --out /app/data/downloads
 
 # 2) Unzip
-docker run --rm \
-  -v $(pwd)/data:/app/data" \
-  ais_summary:latest \
-  -m src.unzipper --zip /app/data/downloads/ais.zip --out /app/data/extracted_files
+docker run --rm
+  -v "$(pwd)/data:/app/data"
+  ais_summary:latest
+  -m src.unzipper
+  --zip /app/data/downloads/aisdk-2024-05-11.zip
+  --out /app/data/extracted_files
 
 # 3) Sort
-docker run --rm \
-  -v $(pwd)/data:/app/data" \
-  ais_summary:latest \
-  -m src.sorter --in /app/data/extracted_files/raw.csv --out /app/data/extracted_files/sorted.csv
+docker run --rm
+  -v "$(pwd)/data:/app/data"
+  ais_summary:latest
+  -m src.sorter
+  --in /app/data/extracted_files/aisdk-2024-05-11.csv
+  --out /app/data/extracted_files/sorted.csv
 
 # 4) Analyze
-docker run --rm \
-  -v $(pwd)/data:/app/data" \
-  -v $(pwd)/output:/app/output" \
-  ais_summary:latest \
-  -m src.analysis --csv /app/data/extracted_files/sorted.csv --out /app/output/summary.json
+docker run --rm
+  -v "$(pwd)/data:/app/data"
+  -v "$(pwd)/output:/app/output"
+  ais_summary:latest
+  -m src.analysis
+  --csv /app/data/extracted_files/sorted.csv
+  --out /app/output/summary.json
 ```
 
 #### Push the image to a registry
