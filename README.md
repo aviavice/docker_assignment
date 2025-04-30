@@ -14,7 +14,7 @@ This repository implements a simple AIS (Automatic Identification System) data p
 ## Installation
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/ais_summary.git
+git clone https://github.com/aviavice/docker_assignment.git
 cd ais_summary
 ```
 
@@ -35,23 +35,23 @@ pip install -r requirements.txt
 
 ```bash
 # 1) Download
-python -m src.download
-  --url https://web.ais.dk/aisdata/aisdk-2024-05-11.zip
+python -m src.download \
+  --url https://web.ais.dk/aisdata/aisdk-2024-05-11.zip \
   --out data/downloads
 
 # 2) Unzip
-python -m src.unzipper
-  --zip data/downloads/aisdk-2024-05-11.zip
+python -m src.unzipper \
+  --zip data/downloads/aisdk-2024-05-11.zip \
   --out data/extracted_files
 
 # 3) Sort
-python -m src.sorter
-  --in data/extracted_files/aisdk-2024-05-11.csv
+python -m src.sorter \
+  --in data/extracted_files/aisdk-2024-05-11.csv \
   --out data/extracted_files/sorted.csv
 
 # 4) Analyze
-python -m src.analysis 
-  --csv data/extracted_files/sorted.csv 
+python -m src.analysis \
+  --csv data/extracted_files/sorted.csv \
   --out output/summary.json
 ```
 
@@ -60,49 +60,55 @@ python -m src.analysis
 #### Build the Docker image
 one time only
 ```bash
-docker build -t ais_summary:latest .
+ docker build -t aviavice/ais_summary:1.0 .
 ```
 
 #### Run in Docker
 
 ```bash
 # 1) Download
-docker run --rm
-  -v "$(pwd)/data:/app/data"
-  ais_summary:latest
-  -m src.download
-  --url https://web.ais.dk/aisdata/aisdk-2024-05-11.zip
+docker run --rm \
+  -v "$(pwd)/data:/app/data" \
+  aviavice/ais_summary:1.0 \
+  -m src.download \
+  --url https://web.ais.dk/aisdata/aisdk-2024-05-11.zip \
   --out /app/data/downloads
 
 # 2) Unzip
-docker run --rm
-  -v "$(pwd)/data:/app/data"
-  ais_summary:latest
-  -m src.unzipper
-  --zip /app/data/downloads/aisdk-2024-05-11.zip
+docker run --rm \
+  -v "$(pwd)/data:/app/data" \
+  aviavice/ais_summary:1.0 \
+  -m src.unzipper \
+  --zip /app/data/downloads/aisdk-2024-05-11.zip \
   --out /app/data/extracted_files
 
 # 3) Sort
-docker run --rm
-  -v "$(pwd)/data:/app/data"
-  ais_summary:latest
-  -m src.sorter
-  --in /app/data/extracted_files/aisdk-2024-05-11.csv
+docker run --rm \
+  -v "$(pwd)/data:/app/data" \
+  aviavice/ais_summary:1.0 \
+  -m src.sorter \
+  --in /app/data/extracted_files/aisdk-2024-05-11.csv \
   --out /app/data/extracted_files/sorted.csv
 
 # 4) Analyze
-docker run --rm
-  -v "$(pwd)/data:/app/data"
-  -v "$(pwd)/output:/app/output"
-  ais_summary:latest
-  -m src.analysis
-  --csv /app/data/extracted_files/sorted.csv
+docker run --rm \
+  -v "$(pwd)/data:/app/data" \
+  -v "$(pwd)/output:/app/output" \
+  aviavice/ais_summary:1.0 \
+  -m src.analysis \
+  --csv /app/data/extracted_files/sorted.csv \
   --out /app/output/summary.json
 ```
 
 #### Push the image to a registry
 ```bash
 docker login
-docker tag ais_summary:latest yourusername/ais_summary:1.0
-docker push yourusername/ais_summary:1.0
+docker push aviavice/ais_summary:1.0
+```
+
+### Published image  
+The container is available on Docker Hub:
+
+```bash
+docker pull aviavice/ais_summary:1.0
 ```
